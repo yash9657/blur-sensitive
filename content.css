@@ -1,0 +1,34 @@
+.page-blur-pro-area {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+}
+
+.page-blur-pro-blurred {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.page-blur-pro-highlight {
+  outline: 2px solid rgba(0, 123, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.page-blur-pro-text {
+  display: inline;
+  filter: blur(5px);
+  cursor: pointer;
+}
+
+.page-blur-pro-element {
+  transition: filter 0.2s ease;
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+}
+
+.page-blur-pro-highlight:hover {
+  outline-color: #357abd !important;
+} 

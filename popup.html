@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Page Blur Pro</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Page Blur Pro</h1>
+    
+    <div class="mode-selector">
+      <button id="textBlur" class="mode-btn">Text Blur</button>
+      <button id="areaBlur" class="mode-btn">Area Blur</button>
+      <button id="elementBlur" class="mode-btn">Element Blur</button>
+    </div>
+    
+    <div class="blur-intensity">
+      <label for="blurAmount">Blur Intensity:</label>
+      <input type="range" id="blurAmount" min="1" max="20" value="5">
+      <span id="blurValue">5px</span>
+    </div>
+    
+    <div class="blur-list">
+      <h2>Blurred Elements</h2>
+      <div id="blurList"></div>
+    </div>
+    
+    <div class="unblur-section">
+      <h2>Unblur Options</h2>
+      <button id="unblurAll" class="unblur-btn">Unblur All</button>
+      <div class="unblur-list">
+        <h3>Click to Unblur</h3>
+        <div id="unblurList"></div>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 

@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Page Blur Pro",
+  "version": "1.0",
+  "description": "Selectively blur text, areas, and elements on any webpage",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/blur-screen.png",
+      "48": "icons/blur-screen.png",
+      "128": "icons/blur-screen.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icons/blur-screen.png",
+    "48": "icons/blur-screen.png",
+    "128": "icons/blur-screen.png"
+  }
+} 

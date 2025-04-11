@@ -1,0 +1,107 @@
+body {
+  width: 300px;
+  padding: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+h1 {
+  font-size: 18px;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+h2 {
+  font-size: 16px;
+  margin: 0 0 10px 0;
+}
+
+h3 {
+  font-size: 14px;
+  margin: 0 0 5px 0;
+}
+
+.mode-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mode-btn {
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #4a90e2;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mode-btn:hover {
+  background-color: #357abd;
+}
+
+.mode-btn.active {
+  background-color: #2c5282;
+}
+
+.blur-intensity {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.blur-intensity input {
+  width: 100%;
+}
+
+.blur-list, .unblur-list {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.blur-item, .unblur-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  margin: 5px 0;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.unblur-btn {
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #e53e3e;
+  color: white;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.unblur-btn:hover {
+  background-color: #c53030;
+}
+
+.unblur-button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #e53e3e;
+  color: white;
+  cursor: pointer;
+}
+
+.unblur-button:hover {
+  background-color: #c53030;
+} 
