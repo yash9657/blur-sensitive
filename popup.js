@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const textBlurBtn = document.getElementById('textBlur');
   const areaBlurBtn = document.getElementById('areaBlur');
   const elementBlurBtn = document.getElementById('elementBlur');
-  const smartBlurBtn = document.getElementById('smartBlur');
   const blurAmount = document.getElementById('blurAmount');
   const blurValue = document.getElementById('blurValue');
   const blurList = document.getElementById('blurList');
@@ -100,19 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
   elementBlurBtn.addEventListener('click', async () => {
     if (await ensureContentScriptInjected()) {
       setMode('element');
-    }
-  });
-  
-  smartBlurBtn.addEventListener('click', async () => {
-    if (await ensureContentScriptInjected()) {
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      try {
-        await chrome.tabs.sendMessage(tab.id, {
-          action: 'smartBlur'
-        });
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
     }
   });
 
