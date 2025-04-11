@@ -110,6 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
         await chrome.tabs.sendMessage(tab.id, {
           action: 'unblurAll'
         });
+        // Update the blur list immediately
+        updateBlurList([]);
       } catch (error) {
         console.error('Error sending message:', error);
       }
@@ -155,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     blurList.innerHTML = '';
     unblurList.innerHTML = '';
     
-    if (blurs.length === 0) {
+    if (!blurs || blurs.length === 0) {
       blurList.innerHTML = '<div class="empty-list">No blurred elements</div>';
       unblurList.innerHTML = '<div class="empty-list">No blurred elements</div>';
       return;
@@ -182,13 +184,21 @@ document.addEventListener('DOMContentLoaded', () => {
       const unblurButton = document.createElement('button');
       unblurButton.textContent = 'Unblur';
       unblurButton.className = 'unblur-button';
-      unblurButton.onclick = () => {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          chrome.tabs.sendMessage(tabs[0].id, {
-            action: 'unblur',
-            index: index
-          });
-        });
+      unblurButton.onclick = async () => {
+        if (await ensureContentScriptInjected()) {
+          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+          try {
+            await chrome.tabs.sendMessage(tab.id, {
+              action: 'unblur',
+              index: index
+            });
+            // Remove the item from the list immediately
+            const updatedBlurs = blurs.filter((_, i) => i !== index);
+            updateBlurList(updatedBlurs);
+          } catch (error) {
+            console.error('Error sending message:', error);
+          }
+        }
       };
       
       unblurItem.appendChild(unblurText);

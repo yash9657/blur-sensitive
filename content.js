@@ -138,6 +138,7 @@ if (window.pageBlurProInitialized) {
           if (element.classList.contains('page-blur-pro-blurred')) {
             if (blur.type === 'area') {
               element.style.backdropFilter = `blur(${this.blurIntensity}px)`;
+              element.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
             } else {
               element.style.filter = `blur(${this.blurIntensity}px)`;
             }
@@ -274,12 +275,16 @@ if (window.pageBlurProInitialized) {
         const selector = this.generateSelector(element);
         if (!selector) return;
         
+        // Remove all blur-related styles
         element.classList.remove('page-blur-pro-blurred');
         element.style.filter = '';
         element.style.backdropFilter = '';
         element.style.backgroundColor = '';
         
+        // Remove from storage
         this.blurs.delete(selector);
+        
+        // Save changes and update UI
         this.saveSettings();
         this.updatePopup();
       } catch (error) {
@@ -296,8 +301,6 @@ if (window.pageBlurProInitialized) {
         if (type === 'area') {
           element.style.backdropFilter = `blur(${this.blurIntensity}px)`;
           element.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        } else if (type === 'text') {
-          element.style.filter = `blur(${this.blurIntensity}px)`;
         } else {
           element.style.filter = `blur(${this.blurIntensity}px)`;
         }
@@ -421,6 +424,8 @@ if (window.pageBlurProInitialized) {
           elements.forEach(element => {
             pageBlurPro.removeBlur(element);
           });
+          // Update the popup after removing the blur
+          pageBlurPro.updatePopup();
         }
         sendResponse({ status: 'ok' });
         return true;
@@ -433,6 +438,10 @@ if (window.pageBlurProInitialized) {
             pageBlurPro.removeBlur(element);
           });
         });
+        // Clear the blurs map
+        pageBlurPro.blurs.clear();
+        // Update the popup after removing all blurs
+        pageBlurPro.updatePopup();
         sendResponse({ status: 'ok' });
         return true;
       }
