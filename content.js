@@ -422,26 +422,21 @@ if (window.pageBlurProInitialized) {
           const blur = blurs[message.index];
           const elements = document.querySelectorAll(blur.selector);
           elements.forEach(element => {
-            pageBlurPro.removeBlur(element);
+            if (element.classList.contains('page-blur-pro-blurred')) {
+              pageBlurPro.removeBlur(element);
+            }
           });
-          // Update the popup after removing the blur
-          pageBlurPro.updatePopup();
         }
         sendResponse({ status: 'ok' });
         return true;
       } else if (message.action === 'unblurAll') {
-        // Remove all blurs
-        const blurs = Array.from(pageBlurPro.blurs.values());
-        blurs.forEach(blur => {
-          const elements = document.querySelectorAll(blur.selector);
-          elements.forEach(element => {
-            pageBlurPro.removeBlur(element);
-          });
+        // Get all blurred elements
+        const blurredElements = document.querySelectorAll('.page-blur-pro-blurred');
+        blurredElements.forEach(element => {
+          pageBlurPro.removeBlur(element);
         });
         // Clear the blurs map
         pageBlurPro.blurs.clear();
-        // Update the popup after removing all blurs
-        pageBlurPro.updatePopup();
         sendResponse({ status: 'ok' });
         return true;
       }

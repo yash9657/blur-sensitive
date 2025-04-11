@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const textBlurBtn = document.getElementById('textBlur');
   const areaBlurBtn = document.getElementById('areaBlur');
   const elementBlurBtn = document.getElementById('elementBlur');
+  const deselectModeBtn = document.getElementById('deselectMode');
   const blurAmount = document.getElementById('blurAmount');
   const blurValue = document.getElementById('blurValue');
   const blurList = document.getElementById('blurList');
@@ -102,6 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Deselect mode button
+  deselectModeBtn.addEventListener('click', async () => {
+    if (await ensureContentScriptInjected()) {
+      setMode(null);
+    }
+  });
+
   // Unblur all button
   unblurAllBtn.addEventListener('click', async () => {
     if (await ensureContentScriptInjected()) {
@@ -119,16 +127,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   async function setMode(mode) {
-    if (activeMode === mode) {
-      activeMode = null;
-      textBlurBtn.classList.remove('active');
-      areaBlurBtn.classList.remove('active');
-      elementBlurBtn.classList.remove('active');
-    } else {
-      activeMode = mode;
-      textBlurBtn.classList.remove('active');
-      areaBlurBtn.classList.remove('active');
-      elementBlurBtn.classList.remove('active');
+    activeMode = mode;
+    
+    // Update button states
+    textBlurBtn.classList.remove('active');
+    areaBlurBtn.classList.remove('active');
+    elementBlurBtn.classList.remove('active');
+    deselectModeBtn.disabled = !mode;
+    
+    if (mode) {
       document.getElementById(`${mode}Blur`).classList.add('active');
     }
 
@@ -147,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     textBlurBtn.classList.remove('active');
     areaBlurBtn.classList.remove('active');
     elementBlurBtn.classList.remove('active');
+    deselectModeBtn.disabled = !activeMode;
     
     if (activeMode) {
       document.getElementById(`${activeMode}Blur`).classList.add('active');
