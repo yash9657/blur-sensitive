@@ -92,7 +92,15 @@ if (window.pageBlurProInitialized) {
 
     async saveSettings() {
       try {
-        if (!this.extensionContextValid) return;
+        if (!this.extensionContextValid) {
+          // Try to reinitialize the extension context
+          this.extensionContextValid = true;
+          await this.init();
+          if (!this.extensionContextValid) {
+            console.warn('Unable to reinitialize extension context');
+            return;
+          }
+        }
         
         const settings = {
           blurs: Object.fromEntries(this.blurs),
@@ -104,17 +112,34 @@ if (window.pageBlurProInitialized) {
       } catch (error) {
         console.error('Error saving settings:', error);
         this.extensionContextValid = false;
+        // Don't throw the error, just log it
       }
     }
 
     setMode(mode) {
       this.activeMode = mode;
+      
+      // Force cursor update by adding/removing a class to the body
+      document.body.classList.remove('page-blur-pro-area-mode', 'page-blur-pro-element-mode');
+      
       if (mode === 'area') {
-        document.body.style.cursor = 'crosshair';
+        document.body.classList.add('page-blur-pro-area-mode');
+        // Create a temporary overlay to ensure cursor changes
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 9998;
+          cursor: crosshair;
+          pointer-events: none;
+        `;
+        document.body.appendChild(overlay);
+        setTimeout(() => overlay.remove(), 100);
       } else if (mode === 'element') {
-        document.body.style.cursor = 'pointer';
-      } else {
-        document.body.style.cursor = 'default';
+        document.body.classList.add('page-blur-pro-element-mode');
       }
       
       // Reset any active drawing
@@ -150,15 +175,49 @@ if (window.pageBlurProInitialized) {
     }
 
     handleMouseDown(e) {
-      if (this.activeMode === 'area') {
+      if (this.activeMode === 'area' && !this.isDrawing) {
         this.isDrawing = true;
+        this.startX = e.clientX;
+        this.startY = e.clientY;
+        
+        // Create the area element
         this.currentArea = document.createElement('div');
         this.currentArea.className = 'page-blur-pro-area';
-        this.currentArea.style.left = `${e.clientX}px`;
-        this.currentArea.style.top = `${e.clientY}px`;
-        this.currentArea.style.width = '0px';
-        this.currentArea.style.height = '0px';
+        this.currentArea.style.cssText = `
+          position: fixed;
+          left: ${this.startX}px;
+          top: ${this.startY}px;
+          width: 0;
+          height: 0;
+          background-color: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(${this.blurIntensity}px);
+          border: 2px dashed rgba(255, 255, 255, 0.5);
+          pointer-events: none;
+          z-index: 9999;
+        `;
         document.body.appendChild(this.currentArea);
+      }
+    }
+
+    handleMouseMove(e) {
+      if (this.activeMode === 'area' && this.isDrawing && this.currentArea) {
+        const width = Math.abs(e.clientX - this.startX);
+        const height = Math.abs(e.clientY - this.startY);
+        const left = Math.min(e.clientX, this.startX);
+        const top = Math.min(e.clientY, this.startY);
+        
+        this.currentArea.style.cssText = `
+          position: fixed;
+          left: ${left}px;
+          top: ${top}px;
+          width: ${width}px;
+          height: ${height}px;
+          background-color: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(${this.blurIntensity}px);
+          border: 2px dashed rgba(255, 255, 255, 0.5);
+          pointer-events: none;
+          z-index: 9999;
+        `;
       }
     }
 
@@ -166,23 +225,21 @@ if (window.pageBlurProInitialized) {
       if (this.activeMode === 'area' && this.isDrawing) {
         this.isDrawing = false;
         if (this.currentArea) {
-          this.addBlur({
-            type: 'area',
-            element: this.currentArea,
-            rect: this.currentArea.getBoundingClientRect()
-          });
+          const rect = this.currentArea.getBoundingClientRect();
+          if (rect.width > 10 && rect.height > 10) {
+            // Add a slight delay to make the transition smoother
+            setTimeout(() => {
+              this.addBlur({
+                type: 'area',
+                element: this.currentArea,
+                rect: rect
+              });
+            }, 50);
+          } else {
+            this.currentArea.remove();
+          }
           this.currentArea = null;
         }
-      }
-    }
-
-    handleMouseMove(e) {
-      if (this.activeMode === 'area' && this.isDrawing && this.currentArea) {
-        const rect = this.currentArea.getBoundingClientRect();
-        const width = Math.max(0, e.clientX - rect.left);
-        const height = Math.max(0, e.clientY - rect.top);
-        this.currentArea.style.width = `${width}px`;
-        this.currentArea.style.height = `${height}px`;
       }
     }
 
@@ -281,6 +338,11 @@ if (window.pageBlurProInitialized) {
         element.style.backdropFilter = '';
         element.style.backgroundColor = '';
         
+        // If it's an area blur, remove the element entirely
+        if (element.classList.contains('page-blur-pro-area')) {
+          element.remove();
+        }
+        
         // Remove from storage
         this.blurs.delete(selector);
         
@@ -301,6 +363,7 @@ if (window.pageBlurProInitialized) {
         if (type === 'area') {
           element.style.backdropFilter = `blur(${this.blurIntensity}px)`;
           element.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+          element.style.pointerEvents = 'auto';
         } else {
           element.style.filter = `blur(${this.blurIntensity}px)`;
         }
@@ -430,13 +493,37 @@ if (window.pageBlurProInitialized) {
         sendResponse({ status: 'ok' });
         return true;
       } else if (message.action === 'unblurAll') {
-        // Get all blurred elements
+        // Get all blurred elements, including area blurs and text blurs
         const blurredElements = document.querySelectorAll('.page-blur-pro-blurred');
+        const areaElements = document.querySelectorAll('.page-blur-pro-area');
+        const textElements = document.querySelectorAll('.page-blur-pro-text');
+        
+        // Remove all regular blurred elements
         blurredElements.forEach(element => {
           pageBlurPro.removeBlur(element);
         });
+        
+        // Remove all area blur elements
+        areaElements.forEach(element => {
+          element.remove();
+        });
+        
+        // Remove all text blur elements
+        textElements.forEach(element => {
+          // Unwrap the text content
+          const parent = element.parentNode;
+          while (element.firstChild) {
+            parent.insertBefore(element.firstChild, element);
+          }
+          parent.removeChild(element);
+        });
+        
         // Clear the blurs map
         pageBlurPro.blurs.clear();
+        
+        // Save the empty state
+        pageBlurPro.saveSettings();
+        
         sendResponse({ status: 'ok' });
         return true;
       }

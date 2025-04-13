@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Page Blur Pro",
+  "name": "BlurGuard",
   "version": "1.0",
   "description": "Selectively blur text, areas, and elements on any webpage",
   "permissions": [
@@ -14,9 +14,9 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icons/blur-screen.png",
-      "48": "icons/blur-screen.png",
-      "128": "icons/blur-screen.png"
+      "16": "icons/cloudy.png",
+      "48": "icons/cloudy.png",
+      "128": "icons/cloudy.png"
     }
   },
   "background": {
@@ -31,8 +31,8 @@
     }
   ],
   "icons": {
-    "16": "icons/blur-screen.png",
-    "48": "icons/blur-screen.png",
-    "128": "icons/blur-screen.png"
+    "16": "icons/cloudy.png",
+    "48": "icons/cloudy.png",
+    "128": "icons/cloudy.png"
   }
 } 

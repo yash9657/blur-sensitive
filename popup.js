@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
       }
       
+      // Check if the URL is restricted
+      if (tab.url.startsWith('chrome://') || tab.url.startsWith('edge://') || tab.url.startsWith('about:')) {
+        console.warn('Cannot inject content script into restricted URL:', tab.url);
+        return false;
+      }
+      
       // Try to send a test message to see if content script is already injected
       try {
         await chrome.tabs.sendMessage(tab.id, { action: 'ping' });

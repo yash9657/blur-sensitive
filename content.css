@@ -1,10 +1,19 @@
+.page-blur-pro-area-mode {
+  cursor: crosshair !important;
+}
+
+.page-blur-pro-element-mode {
+  cursor: pointer !important;
+}
+
 .page-blur-pro-area {
   position: fixed;
   pointer-events: none;
   z-index: 9999;
   backdrop-filter: blur(5px);
   background-color: rgba(255, 255, 255, 0.1);
-  border: none;
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  transition: all 0.1s ease;
 }
 
 .page-blur-pro-blurred {
